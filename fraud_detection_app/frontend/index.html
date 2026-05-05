@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<!-- Main Dashboard for the Banking Transaction Fraud Detection System -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection Dashboard</title>
+    <!-- Link our custom CSS file -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Import Chart.js library from a CDN (Content Delivery Network) for graph rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- HEADER SECTION: Contains Title and API Status -->
+    <header>
+        <div class="header-info">
+            <h1>🛡️ Fraud Detection System</h1>
+            <p>Real-time Transaction Analysis Dashboard</p>
+        </div>
+        <div class="status-indicator">
+            <span id="api-dot" class="dot dot-offline"></span>
+            <span id="api-text">API Offline</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- STATISTICS CARDS: Key numbers from the overall dataset -->
+        <div class="stats-row">
+            <div class="card card-blue">
+                <h3>Total Transactions</h3>
+                <div class="value" id="stat-total">-</div>
+            </div>
+            <div class="card card-red">
+                <h3>Fraud Cases</h3>
+                <div class="value" id="stat-fraud">-</div>
+            </div>
+            <div class="card card-green">
+                <h3>Normal Cases</h3>
+                <div class="value" id="stat-normal">-</div>
+            </div>
+            <div class="card card-orange">
+                <h3>Fraud Percentage</h3>
+                <div class="value" id="stat-percent">-%</div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main-grid">
+            
+            <!-- LEFT COLUMN: Prediction Form -->
+            <div class="left-col">
+                <h2 class="section-title">🔍 Check New Transaction</h2>
+                <div class="form-container">
+                    <form id="prediction-form">
+                        
+                        <div class="form-group">
+                            <label for="amount">Transaction Amount ($)</label>
+                            <input type="number" id="amount" placeholder="e.g. 500.00" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="merchant_id">Merchant ID</label>
+                            <input type="number" id="merchant_id" placeholder="e.g. 101" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="transaction_type">Transaction Type</label>
+                            <select id="transaction_type">
+                                <option value="purchase">Purchase</option>
+                                <option value="refund">Refund</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location">Location (US City)</label>
+                            <select id="location">
+                                <option value="New York">New York</option>
+                                <option value="Chicago">Chicago</option>
+                                <option value="Houston">Houston</option>
+                                <option value="Phoenix">Phoenix</option>
+                                <option value="Philadelphia">Philadelphia</option>
+                                <option value="San Antonio">San Antonio</option>
+                                <option value="San Diego">San Diego</option>
+                                <option value="Dallas">Dallas</option>
+                                <option value="San Jose">San Jose</option>
+                                <option value="Los Angeles">Los Angeles</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Transaction Hour: <span id="hour-val" class="slider-value">12</span>:00</label>
+                            <div class="slider-container">
+                                <input type="range" id="hour" min="0" max="23" value="12">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="day_of_week">Day of Week</label>
+                            <select id="day_of_week">
+                                <option value="0">Monday</option>
+                                <option value="1">Tuesday</option>
+                                <option value="2">Wednesday</option>
+                                <option value="3">Thursday</option>
+                                <option value="4">Friday</option>
+                                <option value="5">Saturday</option>
+                                <option value="6">Sunday</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="month">Month</label>
+                            <select id="month">
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <label class="switch">
+                                <input type="checkbox" id="is_weekend">
+                                <span class="slider"></span>
+                            </label>
+                            <span style="font-size: 0.85rem; font-weight: 500;">Is Weekend?</span>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="submit-btn">
+                            <span id="btn-text">Check Transaction</span>
+                            <div class="spinner" id="btn-spinner"></div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Results and Visualizations -->
+            <div class="right-col">
+                
+                <!-- PREDICTION RESULT: Displayed after analysis -->
+                <div class="results-area" id="results-area">
+                    <div id="result-box" class="result-box">
+                        <h2 id="result-text">NORMAL</h2>
+                        <p>Analysis Complete</p>
+                    </div>
+
+                    <div class="confidence-container">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600; margin-bottom: 5px;">
+                            <span>Model Confidence</span>
+                            <span id="confidence-val">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div id="confidence-bar" class="progress-bar-fill"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-around; font-size: 0.8rem; margin-top: 10px; color: var(--text-muted); border-top: 1px solid #eee; padding-top: 10px;">
+                            <span>Fraud Probability: <strong id="prob-fraud">0</strong></span>
+                            <span>Normal Probability: <strong id="prob-normal">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHARTS ROW: Visual representation of data -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Fraud by Location</h3>
+                        <canvas id="locationChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Data Distribution</h3>
+                        <canvas id="ratioChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- RECENT PREDICTIONS TABLE -->
+                <div class="history-section">
+                    <h3>Recent Local Predictions</h3>
+                    <table id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Result</th>
+                                <th>Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-body">
+                            <!-- Rows will be added here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div> <!-- end right-col -->
+        </div> <!-- end main-grid -->
+    </div> <!-- end container -->
+
+    <!-- Load our JavaScript logic at the end -->
+    <script src="script.js"></script>
+</body>
+</html>

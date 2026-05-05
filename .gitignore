@@ -1,0 +1,39 @@
+# Virtual environments
+.venv/
+dsenv/
+venv/
+env/
+ENV/
+**/venv/
+**/env/
+**/.venv/
+**/dsenv/
+
+# Node modules
+node_modules/
+**/node_modules/
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Data files (Excluding large CSV due to GitHub limits)
+creditcard.csv
+**/creditcard.csv
+processed_transactions.csv
+**/processed_transactions.csv
+credit_card_fraud_dataset.csv
+**/credit_card_fraud_dataset.csv
+*.db
+*.sqlite3
+
+# Model files
+*.pkl
+*.joblib
+**/model_*.pkl
+
+# OS files
+.DS_Store
+Thumbs.db
